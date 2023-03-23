@@ -1,10 +1,61 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    todo : titre de la série | {{ parent() }}
+    {{ serie.name}} | {{ parent() }}
 {% endblock %}
 
 {% block body %}
-todo: : titre de la serie + mes autres aattributs
+
+    <h2>
+        {{ serie.name }}
+        <div>{{ serie.name }}</div>
+        <div>{{ serie.overview }}</div>
+        <div>{{ serie.vote }}</div>
+        <div>{{ serie.genre }}</div>
+        <div>{{ serie.popularity }}</div>
+        <div>{{ serie.firstAirDate | date ('d/m/y')}}</div>
+        <section class="seasons">
+            <h3>Seasons</h3>
+            {% for season in serie.seasons %} {# recoupere variable season #}
+                <article>
+                    <img src="{{ asset('img/posters/seasons/'~season.poster) }}" {# concatedene avec season  #}
+                         alt="{{ serie.name }} season#{{ season.number }}"> {# image  #}
+
+
+                    {# affiche info  #}
+                    <div>
+                        <h4>{{ season.number }}</h4>
+                        <div>{{ season.overview }}</div>
+                        <div>{{ season.firstAirDate | date ('d/m/y') }}</div>
+                    </div>
+                </article>
+
+            {% endfor %}
+        </section>
+
+        <div>
+            {#FORM sozdat' Checking secur dlya tex  cto imeet pravo udolyat' potomu chto eto lien
+         , dlya etogo nam nuj budet zdelat' formulair >>>  'delete function >>> gde ? ~serie.id) #}
+            <form action="{{ path('serie_delete', {'id': serie.id})}}">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~serie.id) }}">
+                <button>Delete</button>
+            </form>
+        </div>
+
+        {#
+        dump($serie);
+       foreach ($serie->getSeasons()as$season){ //affiche season aussi
+           dump($season);
+       }
+       dump($serie); // voir apres
+
+
+
+   <div>{{ serie.dateCreated| date("d/m/y") }}</div>
+   <div>{{ serie.firstAirDate | date("d/m/y")}}</div>
+   <div>{{ serie.genre }}</div>
+   <div>{{ serie.id }}</div>
+        #}
+    </h2>
 {% endblock %}
 

@@ -6,7 +6,16 @@ Create a new serie | {{ parent() }}
 
 {% block body %}
 <div>
-    todo : formulaire de creation de serie
+    {# Balise forme ouvrante #}
+    {{form_start(serieForm)}}
+
+    {# Affichage de touts les formulare  #}
+    {{form_widget(serieForm)}}
+    <button>Create</button>
+
+    {# Balise forme ferment#}
+    {{form_end(serieForm)}}
+
 </div>
 {% endblock %}
 

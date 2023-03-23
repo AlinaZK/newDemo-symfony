@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Serie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,7 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Serie[]    findAll()
  * @method Serie[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SerieRepository extends ServiceEntityRepository
+class SeriesRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -37,6 +38,40 @@ class SerieRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+          /*   //Roquet SQL ce fais dans SeriesRepository
+    public function findBestSeries(){
+        //recherche des meilleur series en DQL
+        $entityManager = $this->getEntityManager();
+
+        $dql = "SELECT s 
+                FROM App\Entity\Serie s 
+                WHERE s.popularity > 100
+                AND s.vote > 8
+                ORDER BY s.popularity DESC";
+
+        $query = $entityManager->createQuery($dql);
+
+        $query->setMaxResults(30);
+
+        return $query->getResult();
+    */
+    public function findBestSeries (){
+        // avec QuerrBuilder
+        $queryBuilder = $this ->createQueryBuilder('s'); // attend un alisas
+        $queryBuilder->leftJoin('s.seasons', 'seas' ); // left join pour recupere les info de season a traver de serie qui n'ont pas de saisons
+        $queryBuilder->addSelect('seas'); // recoupere maxresult
+        $queryBuilder->andWhere('s.popularity > 100'); //filtre popularite jus100
+        $queryBuilder->andWhere('s.vote > 8');
+        $queryBuilder->addOrderBy('s.popularity', 'DESC'); // trie decroisent
+        $queryBuilder->addOrderBy('s.vote','DESC'); // trie decroisent
+
+        $query = $queryBuilder->getQuery(); // recoupere info tape just avent
+        $query->setMaxResults(30); // set maximalno do 30
+
+        $paginator = new Paginator($query);// recoupere addSelector pour change la cantite de resulta avec nouvel variable
+        return $paginator;
+        //return $query->getResult(); // recoupere resulta
     }
 
 //    /**
