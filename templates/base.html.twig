@@ -20,8 +20,16 @@
     </h1>
 
 </header>
-
+{# ajoute pour affiche le formulaire le message  #}
+{% for label, messages in app.flashes  %}
+    {% for message in messages  %}
+        <div class ="flash-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
 <main>
+
     {% block body %}{% endblock %}
 
 </main>

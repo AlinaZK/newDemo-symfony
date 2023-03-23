@@ -1,13 +1,23 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<section>
-    todo : lister les series
+<section class ="series-list">
+    {% for serie in series %}{# src>>Entity>>seris >>> $series[in table] #}
+
+    <article>
+        <a href ="{{ path('serie_details', {'id': serie.id}) }}" title="{{ serie.seasons | length }} season{{ serie.seasons | length >1 ? 's' : '' }}"> {#route avec id insert  int dans url # plus un title affiche seasons avec recoupation un Tableu |length#}
+        {# verifie et ajoute s a la fin #}
+            <img src= "{{asset('img/posters/series/'~serie.poster)}}" alt ="{{serie.name}}"/> {# recouper l'image pour affiche dans base de donne ger juste le nom#}
+        </a>
+    </article>
+    {% endfor %}
+
 </section>
+
 {% endblock %}
 
 
 {% block title %}
-THe best series | {{ parent() }}
+The best series | {{ parent() }}
 {% endblock %}
 

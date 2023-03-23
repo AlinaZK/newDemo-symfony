@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\SerieRepository;
+use App\Repository\SeriesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert; // pour les contrainte
 
-#[ORM\Entity(repositoryClass: SerieRepository::class)]
+#[ORM\Entity(repositoryClass: SeriesRepository::class)]
 class Serie
 {
     #[ORM\Id]
@@ -14,11 +17,21 @@ class Serie
     #[ORM\Column]
     private ?int $id = null;
 
+    // pour les contrainte >>>
+    /**
+     * @Assert\NotBlank (message="Please provide a title")
+     * @Assert\Length (min="2", max = "255",
+     *                minMessage="Length to short",
+     *                maxMessage="Length to long")
+     */
+
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $overview = null;
+
+
 
     #[ORM\Column(length: 50)]
     private ?string $status = null;
@@ -34,13 +47,13 @@ class Serie
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $firstAirDate = null;
-
+    #[Assert\GreaterThanOrEqual(propertyPath: 'firstAirDate')] // pour les contraint colf >>>
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lastAirDate = null;
 
     #[ORM\Column(length: 255)]
     private ?string $backdrop = null;
-
+    #[Assert\Regex(pattern: '/^.+\.(jpg|image|jpeg|png|gif|bmp)$/', message: 'This Poster is not an image')]  // pour les contraint avec Regets>>>
     #[ORM\Column(length: 255)]
     private ?string $poster = null;
 
@@ -52,6 +65,14 @@ class Serie
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateModified = null;
+
+    #[ORM\OneToMany(mappedBy: 'serie', targetEntity: Season::class, orphanRemoval: true)]
+    private Collection $seasons;
+
+    public function __construct()
+    {
+        $this->seasons = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -208,6 +229,36 @@ class Serie
     public function setDateModified(?\DateTimeInterface $dateModified): self
     {
         $this->dateModified = $dateModified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Season>
+     */
+    public function getSeasons(): Collection
+    {
+        return $this->seasons;
+    }
+
+    public function addSeason(Season $season): self
+    {
+        if (!$this->seasons->contains($season)) {
+            $this->seasons->add($season);
+            $season->setSerie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeason(Season $season): self
+    {
+        if ($this->seasons->removeElement($season)) {
+            // set the owning side to null (unless already changed)
+            if ($season->getSerie() === $this) {
+                $season->setSerie(null);
+            }
+        }
 
         return $this;
     }
